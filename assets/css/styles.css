@@ -1088,9 +1088,7 @@ body.light-theme {
     margin-right: auto;
   }
 
-  .section {
-    padding: 6.5rem 0 1rem;
-  }
+  
 
   .section__title {
     margin-bottom: 3.5rem;
@@ -1123,6 +1121,7 @@ body.light-theme {
 
   .about__container {
     grid-template-columns: repeat(2, 1fr);
+    margin-left: 300px;
     align-items: center;
     column-gap: 4rem;
   }
