@@ -2,7 +2,7 @@
 
 A portfolio web site completely made in html css and js from ground up.
 
-#### Watch it live here - [pratik.netlify.app](https://pratik.netlify.app/)
+#### Watch it live here - [pratik.netlify.app](https://pratikraktate.netlify.app/)
 
 <br>
 
