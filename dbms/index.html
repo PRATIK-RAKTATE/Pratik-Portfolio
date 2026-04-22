@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBMS Practicals</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0a0a16;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Optimized matrix background using canvas */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        /* Simplified circuit board pattern */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 170, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 170, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00ffaa, #00ccff, #0066ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(0, 255, 170, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            color: #a0f0e0;
+        }
+
+        .practicals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 20px 0;
+        }
+
+        .practical-card {
+            background: rgba(10, 20, 40, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(0, 255, 170, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 180px;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: cardSlideUp 0.5s ease-out forwards;
+        }
+
+        .practical-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 170, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .practical-card:hover::before {
+            left: 100%;
+        }
+
+        .practical-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 255, 170, 0.2);
+            border: 1px solid rgba(0, 255, 170, 0.6);
+            background: rgba(15, 30, 50, 0.8);
+        }
+
+        .practical-card:active {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            color: #00ffaa;
+        }
+
+        .card-icon {
+            margin-right: 10px;
+            font-size: 1.6rem;
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            line-height: 1.4;
+            color: #c0f0e8;
+        }
+
+        .card-number {
+            display: inline-block;
+            background: rgba(0, 255, 170, 0.2);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: bold;
+            color: #00ffaa;
+            border: 1px solid rgba(0, 255, 170, 0.5);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 40px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            color: #70c0b0;
+        }
+
+        /* Animations */
+        @keyframes cardSlideUp {
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .practicals-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .practical-card {
+                height: 160px;
+                padding: 20px;
+            }
+            
+            .card-title {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .practical-card {
+                height: 150px;
+                padding: 15px;
+            }
+            
+            .card-title {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Optimized matrix background using canvas -->
+    <canvas id="matrix-canvas"></canvas>
+    
+    <div class="container">
+        <header>
+            <h1>DBMS Practicals</h1><p class="subtitle">
+  By <a href="https://www.pratikraktate.in">Pratik Raktate</a>
+</p>
+        </header>
+        
+        <div class="practicals-grid" id="practicalsContainer">
+            <!-- Practical cards will be generated by JavaScript -->
+        </div>
+        
+        <footer>
+            <p>All rights reserved by pratik raktate &copy; 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        // Optimized matrix background using canvas
+        function initMatrix() {
+            const canvas = document.getElementById('matrix-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Matrix characters
+            const chars = "01010101010101010101010101010101";
+            const fontSize = 14;
+            const columns = Math.floor(canvas.width / fontSize);
+            
+            // Array to track the y position of each column
+            const drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.floor(Math.random() * -100);
+            }
+            
+            // Render function
+            function draw() {
+                // Semi-transparent black to create fade effect
+                ctx.fillStyle = 'rgba(10, 10, 22, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#00ffaa';
+                ctx.font = `${fontSize}px monospace`;
+                
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                    const x = i * fontSize;
+                    const y = drops[i] * fontSize;
+                    
+                    ctx.fillText(text, x, y);
+                    
+                    // Reset drop to top when it reaches bottom with some randomness
+                    if (y > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    
+                    drops[i]++;
+                }
+            }
+            
+            // Control animation speed
+            let lastTime = 0;
+            const fps = 15; // Reduced FPS for better performance
+            
+            function animate(time) {
+                if (time - lastTime > 1000 / fps) {
+                    draw();
+                    lastTime = time;
+                }
+                requestAnimationFrame(animate);
+            }
+            
+            animate(0);
+        }
+
+        // Practical data
+        const practicals = [
+            {
+                title: "DBMS Guide",
+                desc: "Interview-ready summary for database technologies, SQL, PL/SQL, MongoDB Compass, SQL*Plus, and login methods.",
+                url: "/dbms/guide",
+                icon: "📘"
+            },
+            {
+                title: "DBMS softwares",
+                desc: "All software required to execute TE SPPU DBMS practicals like MySQL command line tool, MySQl workbench, Oracle 21c XE (SQL plus), mongosh shell, mongoDB compass",
+                url: "https://humble-quesadilla-7b1.notion.site/ALL-Softwares-278b95436b42801b90f7c4ffee32a834",
+                icon: "🖥️"
+            },
+            {
+                title: "SQl-1",
+                desc: "Design and Develop SQL DDL statements which demonstrate the use of SQL such as Table, View, Index, Sequence, Synonym",
+                url: "https://humble-quesadilla-7b1.notion.site/SQL-1-278b95436b42804fb165df65c8c77afb",
+                icon: "📊"
+            },
+            {
+                title: "SQL-2",
+                desc: " Design at least 10 SQL queries for selected real time application using SQL DML statements: Insert, select, Update,	Delete	with operators, functions	and	set    operator.",
+                url: "https://humble-quesadilla-7b1.notion.site/SQL-2-278b95436b42805db417ca6d3f793b61",
+                icon: "🗃️"
+            },
+            {
+                title: "SQL-3",
+                desc: "Design at least 10 SQL queries for  selected real time application database using SQL DML statements for all types of Join, Sub-Query and View.",
+                url: "https://humble-quesadilla-7b1.notion.site/SQL-3-278b95436b42801d9d3fdff56cb08cda",
+                icon: "🔍"
+            },
+            {
+                title: "PL/SQL-1",
+                desc: "Write a PL/SQL code block to calculate the area of a circle for a value of radius varying from 5 to 9. Store the radius and the corresponding values of calculated area in an empty table named areas,consisting of two columns,radius and area.",
+                url: "https://humble-quesadilla-7b1.notion.site/PL-SQL-1-278b95436b428043a303e188799117c5",
+                icon: "📈"
+            },
+            {
+                title: "PL/SQL-2",
+                desc: "Write a Stored Procedure namely proc_Grade for the categorization of student. If marks scored by students in examination is <=1500 and marks>=990 then student will be placed in distinction category if marks scored are between 989 and 900 category is first class, if marks 899 and 825 category is Higher Second Class. Write a PL/SQL block to use procedure created  with above requirement. Stud_Marks(name, total_marks) . Result(Roll, Name, Class)",
+                url: "https://humble-quesadilla-7b1.notion.site/PL-SQL-2-27bb95436b4280c1a3ffe03926dd77a3",
+                icon: "📈"
+            },
+            {
+                title: "PL/SQL-3",
+                desc: "Write a PL/SQL block of code using parameterized Cursor that will merge the data available in the newly created table N_RollCall with the data available in the table O_RollCall. If the data in the first table already exist in the second table then that data should be skipped.",
+                url: "https://humble-quesadilla-7b1.notion.site/PL-SQL-3-27cb95436b4280e88934ee62ed34c825",
+                icon: "📈"
+            },
+            {
+                title: "PL/SQL-4",
+                desc: "Write a database trigger on Library table. The System should keep track of the records that are being updated or deleted. The old value of updated or deleted records should be added in Library Audit table.",
+                url: "https://humble-quesadilla-7b1.notion.site/PL-SQL-4-27cb95436b4280aabafcd04fbc3dfbc8",
+                icon: "📈"
+            },
+            {
+                title: "MySQL connection",
+                desc: "Write a program to implement MYSQL/Oracle database connectivity with any front end language to implement Database navigation operations (add, delete, edit etc).",
+                url: "https://humble-quesadilla-7b1.notion.site/MySQL-connection-27cb95436b428082a338c57bf670b6db",
+                icon: "📈"
+            },
+            {
+                title: "MongoDB - 1",
+                desc: "MongoDB Queries: Design and Develop MongoDB Queries using CRUD operations. (Use CRUD operations, SAVE method, logical operators etc)",
+                url: "https://humble-quesadilla-7b1.notion.site/MongoDB-connection-27cb95436b4280c9a2cbc3d438dab86e",
+                icon: "📈"
+            },
+            {
+                title: "MongoDB - 2",
+                desc: "MongoDB - Aggregation and Indexing: Design and Develop MongoDB Queries using aggregation and indexing with suitable example using MongoDB",
+                url: "https://humble-quesadilla-7b1.notion.site/MongoDB-2-27cb95436b42807b8e41de6068384e52",
+                icon: "📈"
+            },
+            {
+                title: "MongoDB - 3",
+                desc: "MongoDB - Map reduces operations: Implement Map reduces operation with suitable example using MongoDB.",
+                url: "https://humble-quesadilla-7b1.notion.site/MongoDB-3-27cb95436b4280b98a80da671fde3a32",
+                icon: "📈"
+            },
+            {
+                title: "MongoDB - 4",
+                desc: "Database Connectivity: Write a program to implement MongoDB database connectivity with any front end language to   implement Database navigation operations (add, delete, edit etc)",
+                url: "https://humble-quesadilla-7b1.notion.site/MongoDB-connection-27cb95436b42809fb84fd1219d3f6343",
+                icon: "📈"
+            }
+        ];
+
+        // Generate practical cards with optimized animation
+        const container = document.getElementById('practicalsContainer');
+        
+        practicals.forEach((practical, index) => {
+            // Create anchor tag instead of div for direct linking
+            const cardLink = document.createElement('a');
+            cardLink.className = 'practical-card';
+            cardLink.href = practical.url;
+            cardLink.style.animationDelay = `${index * 0.1}s`;
+            cardLink.style.textDecoration = 'none';
+            cardLink.style.color = 'inherit';
+            
+            cardLink.innerHTML = `
+                <div>
+                    <h3 class="card-title">
+                        <span class="card-number">${index}</span>
+                        <span class="card-icon">${practical.icon}</span>
+                        ${practical.title}
+                    </h3>
+                    <p class="card-desc">${practical.desc}</p>
+                </div>
+            `;
+            
+            // Add click animation
+            cardLink.addEventListener('click', (e) => {
+                if (practical.url === "#") {
+                    e.preventDefault();
+                }
+                
+                cardLink.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    cardLink.style.transform = '';
+                }, 300);
+            });
+            
+            container.appendChild(cardLink);
+        });
+
+        // Initialize the matrix background when the page loads
+        window.addEventListener('load', initMatrix);
+    </script>
+</body>
+</html>

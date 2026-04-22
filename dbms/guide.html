@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBMS Guide | Pratik Raktate</title>
+    <meta name="description" content="Compact DBMS guide covering MySQL, MongoDB, SQL, PL/SQL, Compass, SQL*Plus, and SYSDBA login basics.">
+    <link rel="canonical" href="https://pratikraktate.netlify.app/dbms/guide">
+    <style>
+        :root {
+            --bg: #080b12;
+            --panel: rgba(15, 23, 42, 0.74);
+            --panel-strong: rgba(18, 31, 52, 0.92);
+            --line: rgba(148, 163, 184, 0.2);
+            --line-strong: rgba(45, 212, 191, 0.34);
+            --text: #f8fafc;
+            --muted: #aebbd0;
+            --soft: #dbe6f5;
+            --accent: #2dd4bf;
+            --accent-2: #7dd3fc;
+            --warning: #facc15;
+            --danger: #fb7185;
+            --code: #06111f;
+            --shadow: 0 26px 80px rgba(0, 0, 0, 0.36);
+            --radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 6rem;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                linear-gradient(135deg, rgba(45, 212, 191, 0.08), transparent 32rem),
+                linear-gradient(225deg, rgba(125, 211, 252, 0.08), transparent 30rem),
+                var(--bg);
+            color: var(--muted);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            line-height: 1.65;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background-image:
+                linear-gradient(rgba(148, 163, 184, 0.055) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, 0.055) 1px, transparent 1px);
+            background-size: 44px 44px;
+            mask-image: linear-gradient(to bottom, #000 0%, transparent 82%);
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 0%, rgba(45, 212, 191, 0.12), transparent 24rem);
+            pointer-events: none;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .shell {
+            width: min(1180px, calc(100% - 2rem));
+            margin: 0 auto;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            border-bottom: 1px solid var(--line);
+            background: rgba(8, 11, 18, 0.8);
+            backdrop-filter: blur(18px);
+        }
+
+        .topbar__inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            min-height: 4.6rem;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .brand__mark,
+        .icon {
+            display: inline-grid;
+            place-items: center;
+            flex: 0 0 auto;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, rgba(45, 212, 191, 0.2), rgba(125, 211, 252, 0.12));
+            border: 1px solid var(--line-strong);
+            color: var(--accent);
+            font-weight: 900;
+        }
+
+        .brand__mark {
+            width: 2.35rem;
+            height: 2.35rem;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--soft);
+            font-size: 0.92rem;
+            font-weight: 700;
+        }
+
+        .nav a {
+            padding: 0.62rem 0.85rem;
+            border: 1px solid transparent;
+            border-radius: 999px;
+        }
+
+        .nav a:hover,
+        .nav a:focus-visible {
+            border-color: var(--line);
+            background: rgba(148, 163, 184, 0.1);
+            outline: none;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.08fr) minmax(18rem, 0.72fr);
+            gap: 2rem;
+            align-items: center;
+            padding: 4.5rem 0 3rem;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            margin-bottom: 1.15rem;
+            color: var(--accent);
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .eyebrow::before {
+            content: "";
+            width: 2.25rem;
+            height: 2px;
+            background: var(--accent);
+        }
+
+        h1 {
+            max-width: 13ch;
+            color: var(--text);
+            font-size: clamp(2.5rem, 6vw, 5.6rem);
+            line-height: 0.98;
+            letter-spacing: -0.05em;
+        }
+
+        .hero__copy {
+            max-width: 58ch;
+            margin-top: 1.35rem;
+            color: var(--soft);
+            font-size: clamp(1rem, 2vw, 1.18rem);
+        }
+
+        .hero__actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 2rem;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.55rem;
+            min-height: 3rem;
+            padding: 0.78rem 1.05rem;
+            border: 1px solid var(--line-strong);
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #031013;
+            font-weight: 900;
+            box-shadow: 0 18px 45px rgba(45, 212, 191, 0.16);
+        }
+
+        .button--ghost {
+            background: rgba(15, 23, 42, 0.72);
+            color: var(--text);
+            box-shadow: none;
+        }
+
+        .visual {
+            position: relative;
+            min-height: 27rem;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background:
+                linear-gradient(160deg, rgba(45, 212, 191, 0.14), transparent 48%),
+                linear-gradient(25deg, rgba(125, 211, 252, 0.12), transparent 46%),
+                rgba(15, 23, 42, 0.58);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .visual::before {
+            content: "";
+            position: absolute;
+            inset: 1.2rem;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: var(--radius);
+            background-image:
+                linear-gradient(rgba(45, 212, 191, 0.12) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(45, 212, 191, 0.12) 1px, transparent 1px);
+            background-size: 34px 34px;
+        }
+
+        .db-stack {
+            position: absolute;
+            inset: 3rem;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+            align-content: center;
+        }
+
+        .db-node {
+            min-height: 6rem;
+            padding: 1rem;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            border-radius: var(--radius);
+            background: rgba(6, 17, 31, 0.82);
+        }
+
+        .db-node strong {
+            display: block;
+            color: var(--text);
+            font-size: 1.05rem;
+        }
+
+        .db-node span {
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .db-node--wide {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .pulse {
+            width: 0.7rem;
+            height: 0.7rem;
+            border-radius: 999px;
+            background: var(--accent);
+            box-shadow: 0 0 0 8px rgba(45, 212, 191, 0.12);
+        }
+
+        .section {
+            padding: 3rem 0;
+        }
+
+        .section__head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .section__head h2 {
+            color: var(--text);
+            font-size: clamp(1.55rem, 3vw, 2.4rem);
+            line-height: 1.12;
+            letter-spacing: -0.035em;
+        }
+
+        .section__head p {
+            max-width: 42rem;
+        }
+
+        .grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .grid--three {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .grid--two {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .card {
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--panel);
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
+        }
+
+        .card__body {
+            padding: 1.2rem;
+        }
+
+        .card h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            margin-bottom: 0.7rem;
+            color: var(--text);
+            font-size: 1.08rem;
+        }
+
+        .icon {
+            width: 2rem;
+            height: 2rem;
+            font-size: 0.76rem;
+            letter-spacing: 0;
+        }
+
+        .tag {
+            display: inline-flex;
+            width: fit-content;
+            margin-top: 0.9rem;
+            padding: 0.32rem 0.58rem;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--accent);
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--panel);
+        }
+
+        table {
+            width: 100%;
+            min-width: 680px;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--line);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--text);
+            background: rgba(45, 212, 191, 0.09);
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        td {
+            color: var(--soft);
+        }
+
+        tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .code-card {
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--code);
+        }
+
+        .code-card__top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.78rem 1rem;
+            border-bottom: 1px solid var(--line);
+            background: rgba(15, 23, 42, 0.88);
+            color: var(--text);
+            font-weight: 800;
+        }
+
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            min-height: 2rem;
+            padding: 0.35rem 0.65rem;
+            border: 1px solid rgba(45, 212, 191, 0.3);
+            border-radius: 999px;
+            background: rgba(45, 212, 191, 0.1);
+            color: var(--accent);
+            cursor: pointer;
+            font: inherit;
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        pre {
+            overflow-x: auto;
+            padding: 1rem;
+        }
+
+        code {
+            color: #d8f8f3;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+            font-size: 0.92rem;
+        }
+
+        .note {
+            border-left: 4px solid var(--warning);
+            background: rgba(250, 204, 21, 0.08);
+        }
+
+        .danger {
+            border-left: 4px solid var(--danger);
+            background: rgba(251, 113, 133, 0.08);
+        }
+
+        .list {
+            display: grid;
+            gap: 0.65rem;
+            margin-top: 0.75rem;
+        }
+
+        .list li {
+            display: flex;
+            gap: 0.6rem;
+            color: var(--soft);
+        }
+
+        .list li::before {
+            content: "";
+            flex: 0 0 auto;
+            width: 0.42rem;
+            height: 0.42rem;
+            margin-top: 0.62rem;
+            border-radius: 999px;
+            background: var(--accent);
+        }
+
+        .compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .wrong,
+        .right {
+            padding: 1.1rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--line);
+            background: var(--panel);
+        }
+
+        .wrong h3 {
+            color: var(--danger);
+        }
+
+        .right h3 {
+            color: var(--accent);
+        }
+
+        .summary {
+            margin: 3rem 0 4rem;
+            padding: 1.4rem;
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, rgba(45, 212, 191, 0.13), rgba(125, 211, 252, 0.08)), var(--panel-strong);
+            color: var(--text);
+            font-size: clamp(1.1rem, 2vw, 1.45rem);
+            font-weight: 900;
+            line-height: 1.35;
+        }
+
+        footer {
+            padding: 2rem 0 3rem;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            text-align: center;
+        }
+
+        @media (max-width: 900px) {
+            .hero,
+            .grid--three,
+            .grid--two,
+            .compare {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding-top: 3rem;
+            }
+
+            .visual {
+                min-height: 22rem;
+            }
+
+            .section__head {
+                display: block;
+            }
+
+            .section__head p {
+                margin-top: 0.55rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .topbar__inner {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 0.9rem 0;
+            }
+
+            .nav {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 0.15rem;
+            }
+
+            .nav a {
+                white-space: nowrap;
+            }
+
+            .hero__actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .button {
+                width: 100%;
+            }
+
+            .db-stack {
+                inset: 2rem;
+                grid-template-columns: 1fr;
+            }
+
+            .db-node {
+                min-height: auto;
+            }
+
+            .db-node--wide {
+                grid-column: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="shell topbar__inner">
+            <a class="brand" href="/dbms/">
+                <span class="brand__mark">DB</span>
+                <span>DBMS Guide</span>
+            </a>
+            <nav class="nav" aria-label="Guide sections">
+                <a href="#basics">Basics</a>
+                <a href="#connect">Connect</a>
+                <a href="#sysdba">SYSDBA</a>
+                <a href="#memory">Memory</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="shell hero">
+            <div>
+                <span class="eyebrow">Interview-ready notes</span>
+                <h1>DBMS tools, databases, and logins</h1>
+                <p class="hero__copy">
+                    A compact guide that separates database technologies, query languages, GUI/CLI tools,
+                    and the correct way to connect before writing SQL or PL/SQL.
+                </p>
+                <div class="hero__actions">
+                    <a class="button" href="#connect">View login commands</a>
+                    <a class="button button--ghost" href="/dbms/">Back to practicals</a>
+                </div>
+            </div>
+
+            <div class="visual" aria-label="Database technology diagram">
+                <div class="db-stack">
+                    <div class="db-node">
+                        <strong>MySQL</strong>
+                        <span>Relational database</span>
+                    </div>
+                    <div class="db-node">
+                        <strong>MongoDB</strong>
+                        <span>Document database</span>
+                    </div>
+                    <div class="db-node">
+                        <strong>SQL</strong>
+                        <span>Query language</span>
+                    </div>
+                    <div class="db-node">
+                        <strong>PL/SQL</strong>
+                        <span>Oracle language</span>
+                    </div>
+                    <div class="db-node db-node--wide">
+                        <div>
+                            <strong>Connect first, query second</strong>
+                            <span>Use MySQL CLI, mongosh, Compass, or SQL*Plus.</span>
+                        </div>
+                        <span class="pulse" aria-hidden="true"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="shell section" id="basics">
+            <div class="section__head">
+                <h2>Tools vs Technology vs Language</h2>
+                <p>Use these names correctly in interviews and practical writeups.</p>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>MySQL</td>
+                            <td>Database Technology</td>
+                            <td>Relational database that stores data in tables.</td>
+                        </tr>
+                        <tr>
+                            <td>MongoDB</td>
+                            <td>Database Technology</td>
+                            <td>NoSQL document database that stores JSON-like documents.</td>
+                        </tr>
+                        <tr>
+                            <td>SQL</td>
+                            <td>Language</td>
+                            <td>Query language for relational databases.</td>
+                        </tr>
+                        <tr>
+                            <td>PL/SQL</td>
+                            <td>Language</td>
+                            <td>Oracle procedural SQL language.</td>
+                        </tr>
+                        <tr>
+                            <td>MongoDB Compass</td>
+                            <td>Tool</td>
+                            <td>GUI tool to manage MongoDB visually.</td>
+                        </tr>
+                        <tr>
+                            <td>SQL*Plus</td>
+                            <td>Tool</td>
+                            <td>CLI tool to connect and manage Oracle Database.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="shell section">
+            <div class="section__head">
+                <h2>What Stores Data?</h2>
+                <p>Database engines store the actual records. Languages and tools only help you work with them.</p>
+            </div>
+            <div class="grid grid--three">
+                <article class="card">
+                    <div class="card__body">
+                        <h3><span class="icon">MY</span> MySQL</h3>
+                        <p>Stores relational data using databases, tables, rows, and columns.</p>
+                        <span class="tag">Database engine</span>
+                    </div>
+                </article>
+                <article class="card">
+                    <div class="card__body">
+                        <h3><span class="icon">MO</span> MongoDB</h3>
+                        <p>Stores flexible document data inside collections.</p>
+                        <span class="tag">Database engine</span>
+                    </div>
+                </article>
+                <article class="card">
+                    <div class="card__body">
+                        <h3><span class="icon">OR</span> Oracle</h3>
+                        <p>Stores enterprise relational data and supports SQL plus PL/SQL.</p>
+                        <span class="tag">Database engine</span>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="shell section">
+            <div class="section__head">
+                <h2>Query Languages</h2>
+                <p>SQL is used broadly. PL/SQL is Oracle-specific and adds procedural programming features.</p>
+            </div>
+            <div class="grid grid--two">
+                <article class="card">
+                    <div class="card__body">
+                        <h3><span class="icon">SQL</span> SQL</h3>
+                        <p>Used in MySQL, Oracle, PostgreSQL, SQL Server, and other relational databases.</p>
+                        <ul class="list">
+                            <li>Select, insert, update, and delete records.</li>
+                            <li>Create tables, views, indexes, and relationships.</li>
+                        </ul>
+                    </div>
+                    <div class="code-card">
+                        <div class="code-card__top">
+                            <span>Example</span>
+                            <button class="copy-btn" type="button" data-copy="SELECT * FROM users;">Copy</button>
+                        </div>
+                        <pre><code>SELECT * FROM users;</code></pre>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <div class="card__body">
+                        <h3><span class="icon">PL</span> PL/SQL</h3>
+                        <p>Used only in Oracle. It adds variables, loops, procedures, and exception handling.</p>
+                        <ul class="list">
+                            <li>Write stored procedures and functions.</li>
+                            <li>Handle procedural database logic in Oracle.</li>
+                        </ul>
+                    </div>
+                    <div class="code-card">
+                        <div class="code-card__top">
+                            <span>Example</span>
+                            <button class="copy-btn" type="button" data-copy="BEGIN&#10; DBMS_OUTPUT.PUT_LINE('Hello');&#10;END;&#10;/">Copy</button>
+                        </div>
+                        <pre><code>BEGIN
+ DBMS_OUTPUT.PUT_LINE('Hello');
+END;
+/</code></pre>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="shell section" id="connect">
+            <div class="section__head">
+                <h2>Login and Connect</h2>
+                <p>You do not log in to SQL or PL/SQL. You connect to a database, then run the language.</p>
+            </div>
+
+            <div class="grid grid--two">
+                <article class="code-card">
+                    <div class="code-card__top">
+                        <span>MySQL CLI</span>
+                        <button class="copy-btn" type="button" data-copy="mysql -u root -p">Copy</button>
+                    </div>
+                    <pre><code>mysql -u root -p</code></pre>
+                </article>
+
+                <article class="code-card">
+                    <div class="code-card__top">
+                        <span>MySQL Remote</span>
+                        <button class="copy-btn" type="button" data-copy="mysql -h localhost -P 3306 -u root -p">Copy</button>
+                    </div>
+                    <pre><code>mysql -h localhost -P 3306 -u root -p</code></pre>
+                </article>
+
+                <article class="code-card">
+                    <div class="code-card__top">
+                        <span>MongoDB CLI</span>
+                        <button class="copy-btn" type="button" data-copy="mongosh">Copy</button>
+                    </div>
+                    <pre><code>mongosh</code></pre>
+                </article>
+
+                <article class="code-card">
+                    <div class="code-card__top">
+                        <span>MongoDB With Auth</span>
+                        <button class="copy-btn" type="button" data-copy="mongosh &quot;mongodb://user:pass@localhost:27017&quot;">Copy</button>
+                    </div>
+                    <pre><code>mongosh "mongodb://user:pass@localhost:27017"</code></pre>
+                </article>
+
+                <article class="code-card">
+                    <div class="code-card__top">
+                        <span>MongoDB Compass Local</span>
+                        <button class="copy-btn" type="button" data-copy="mongodb://localhost:27017">Copy</button>
+                    </div>
+                    <pre><code>mongodb://localhost:27017</code></pre>
+                </article>
+
+                <article class="code-card">
+                    <div class="code-card__top">
+                        <span>MongoDB Compass Atlas</span>
+                        <button class="copy-btn" type="button" data-copy="mongodb+srv://user:pass@cluster.mongodb.net">Copy</button>
+                    </div>
+                    <pre><code>mongodb+srv://user:pass@cluster.mongodb.net</code></pre>
+                </article>
+
+                <article class="code-card">
+                    <div class="code-card__top">
+                        <span>Oracle SQL*Plus</span>
+                        <button class="copy-btn" type="button" data-copy="sqlplus hr/hr@localhost:1521/XEPDB1">Copy</button>
+                    </div>
+                    <pre><code>sqlplus hr/hr@localhost:1521/XEPDB1</code></pre>
+                </article>
+
+                <article class="code-card">
+                    <div class="code-card__top">
+                        <span>Oracle Admin</span>
+                        <button class="copy-btn" type="button" data-copy="sqlplus sys/password as sysdba">Copy</button>
+                    </div>
+                    <pre><code>sqlplus sys/password as sysdba</code></pre>
+                </article>
+            </div>
+        </section>
+
+        <section class="shell section" id="sysdba">
+            <div class="section__head">
+                <h2>What is AS SYSDBA?</h2>
+                <p>SYSDBA is an Oracle-only administrative privilege for high-level database control.</p>
+            </div>
+
+            <div class="grid grid--two">
+                <article class="card note">
+                    <div class="card__body">
+                        <h3>Used for Oracle administration</h3>
+                        <ul class="list">
+                            <li>Start up the database.</li>
+                            <li>Shut down the database.</li>
+                            <li>Run recovery tasks.</li>
+                            <li>Perform full administration.</li>
+                        </ul>
+                    </div>
+                </article>
+
+                <article class="card danger">
+                    <div class="card__body">
+                        <h3>Do not use it for normal apps</h3>
+                        <p>Applications should use limited-privilege users, not super admin accounts.</p>
+                        <ul class="list">
+                            <li>Avoid MySQL root in apps.</li>
+                            <li>Avoid Oracle SYS in apps.</li>
+                            <li>Avoid MongoDB admin in apps.</li>
+                        </ul>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="shell section">
+            <div class="section__head">
+                <h2>Correct Thinking</h2>
+                <p>Use this distinction to avoid common DBMS interview mistakes.</p>
+            </div>
+            <div class="compare">
+                <div class="wrong">
+                    <h3>Wrong</h3>
+                    <ul class="list">
+                        <li>Login to SQL.</li>
+                        <li>Login to PL/SQL.</li>
+                    </ul>
+                </div>
+                <div class="right">
+                    <h3>Correct</h3>
+                    <ul class="list">
+                        <li>Login to MySQL.</li>
+                        <li>Login to MongoDB.</li>
+                        <li>Login to Oracle using SQL*Plus.</li>
+                        <li>Then run SQL or PL/SQL.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="shell section" id="memory">
+            <div class="section__head">
+                <h2>Easy Memory Trick</h2>
+                <p>One quick mapping for revision before practicals or viva.</p>
+            </div>
+            <div class="grid grid--three">
+                <article class="card"><div class="card__body"><h3><span class="icon">MY</span> MySQL</h3><p>Relational database.</p></div></article>
+                <article class="card"><div class="card__body"><h3><span class="icon">MO</span> MongoDB</h3><p>Document database.</p></div></article>
+                <article class="card"><div class="card__body"><h3><span class="icon">SQL</span> SQL</h3><p>Query language.</p></div></article>
+                <article class="card"><div class="card__body"><h3><span class="icon">PL</span> PL/SQL</h3><p>Oracle programming language.</p></div></article>
+                <article class="card"><div class="card__body"><h3><span class="icon">GUI</span> Compass</h3><p>MongoDB GUI tool.</p></div></article>
+                <article class="card"><div class="card__body"><h3><span class="icon">CLI</span> SQL*Plus</h3><p>Oracle CLI tool.</p></div></article>
+            </div>
+        </section>
+
+        <div class="shell">
+            <p class="summary">MySQL and MongoDB are databases, SQL and PL/SQL are languages, Compass and SQL*Plus are tools, and SYSDBA is an Oracle admin privilege.</p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="shell">All rights reserved by Pratik Raktate &copy; 2026</div>
+    </footer>
+
+    <script>
+        document.querySelectorAll("[data-copy]").forEach((button) => {
+            button.addEventListener("click", async () => {
+                const originalText = button.textContent;
+                try {
+                    await navigator.clipboard.writeText(button.dataset.copy);
+                    button.textContent = "Copied";
+                } catch (error) {
+                    button.textContent = "Select";
+                }
+                window.setTimeout(() => {
+                    button.textContent = originalText;
+                }, 1400);
+            });
+        });
+    </script>
+</body>
+</html>
