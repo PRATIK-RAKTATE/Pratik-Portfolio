@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Tools & Hosting Purchase Timeline</title>
+  <style>
+:root {
+  --bg: #0b0f17;
+  --panel: #111827;
+  --panel-2: #161f2e;
+  --text: #f8fafc;
+  --muted: #9ca3af;
+  --line: #334155;
+  --accent: #f97316;
+  --shadow: 0 20px 60px rgba(0,0,0,.35);
+  --radius: 22px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(249,115,22,.18), transparent 34%),
+    radial-gradient(circle at top right, rgba(56,189,248,.13), transparent 28%),
+    var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.page {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.4fr .9fr;
+  gap: 24px;
+  align-items: stretch;
+  margin-bottom: 28px;
+}
+
+.hero-main,
+.summary-card,
+.section {
+  background: linear-gradient(145deg, rgba(17,24,39,.94), rgba(22,31,46,.96));
+  border: 1px solid rgba(148,163,184,.18);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+}
+
+.hero-main {
+  padding: 34px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-main::after {
+  content: "";
+  position: absolute;
+  right: -70px;
+  top: -70px;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: rgba(249,115,22,.14);
+}
+
+.kicker {
+  color: var(--accent);
+  letter-spacing: .14em;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
+
+h1 {
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: .95;
+  margin: 0 0 18px;
+  max-width: 760px;
+}
+
+.hero-main p {
+  color: var(--muted);
+  max-width: 700px;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.summary-card {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.total-label {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.total-amount {
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.filter-status {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.metric {
+  background: rgba(15,23,42,.72);
+  border: 1px solid rgba(148,163,184,.14);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.metric span {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.metric strong {
+  font-size: 20px;
+}
+
+.section {
+  padding: 28px;
+  margin-top: 24px;
+}
+
+.filter-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filter-title h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.filter-title p,
+.section-title p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.filter-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  cursor: pointer;
+  border: 1px solid rgba(148,163,184,.22);
+  background: rgba(15,23,42,.84);
+  color: var(--text);
+  padding: 11px 15px;
+  border-radius: 999px;
+  font-weight: 800;
+  transition: transform .2s ease, border-color .2s ease, background .2s ease;
+}
+
+.filter-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(249,115,22,.65);
+}
+
+.filter-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #111827;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.section-title h2 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.timeline {
+  position: relative;
+  padding: 6px 0;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 156px;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--line), transparent);
+}
+
+.timeline-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 130px 38px 1fr;
+  align-items: stretch;
+  margin-bottom: 18px;
+}
+
+.timeline-date {
+  color: var(--text);
+  font-weight: 800;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding-right: 18px;
+}
+
+.timeline-date small {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  margin-top: 4px;
+}
+
+.timeline-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin: 24px auto 0;
+  border: 3px solid var(--bg);
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(249,115,22,.18);
+  z-index: 2;
+}
+
+.card-content {
+  background: rgba(15,23,42,.72);
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 18px;
+  padding: 18px;
+  transition: transform .2s ease, border-color .2s ease;
+}
+
+.card-content:hover {
+  transform: translateY(-2px);
+  border-color: rgba(249,115,22,.55);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.card-top strong {
+  font-size: 22px;
+}
+
+h3 {
+  margin: 12px 0 8px;
+  font-size: 20px;
+}
+
+.card-content p {
+  color: var(--muted);
+  margin: 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 7px 11px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  background: rgba(148,163,184,.16);
+  color: #e5e7eb;
+}
+
+.badge.claude {
+  background: rgba(249,115,22,.18);
+  color: #fed7aa;
+}
+
+.badge.railway {
+  background: rgba(56,189,248,.16);
+  color: #bae6fd;
+}
+
+.badge.openai {
+  background: rgba(34,197,94,.14);
+  color: #bbf7d0;
+}
+
+.bars {
+  display: grid;
+  gap: 18px;
+}
+
+.bar-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.bar-label span {
+  color: #e5e7eb;
+  font-weight: 750;
+}
+
+.bar-track {
+  height: 13px;
+  background: rgba(148,163,184,.16);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), #facc15);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 18px;
+  border: 1px solid rgba(148,163,184,.16);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+  background: rgba(15,23,42,.72);
+}
+
+th, td {
+  text-align: left;
+  padding: 15px 16px;
+  border-bottom: 1px solid rgba(148,163,184,.12);
+}
+
+th {
+  color: #cbd5e1;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  background: rgba(30,41,59,.68);
+}
+
+td {
+  color: #f8fafc;
+}
+
+tr:last-child td {
+  border-bottom: 0;
+}
+
+.note,
+.empty-state {
+  color: var(--muted);
+  margin-top: 16px;
+  line-height: 1.6;
+}
+
+.empty-state {
+  display: none;
+  background: rgba(15,23,42,.72);
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.is-hidden {
+  display: none !important;
+}
+
+.footer {
+  color: var(--muted);
+  text-align: center;
+  margin-top: 28px;
+  font-size: 13px;
+}
+
+@media (max-width: 820px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline::before {
+    left: 12px;
+  }
+
+  .timeline-card {
+    grid-template-columns: 28px 1fr;
+  }
+
+  .timeline-date {
+    grid-column: 2;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0 0 8px;
+  }
+
+  .timeline-dot {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    margin-top: 32px;
+  }
+
+  .card-content {
+    grid-column: 2;
+  }
+
+  .section-title,
+  .filter-panel {
+    display: block;
+  }
+
+  .filter-actions {
+    margin-top: 18px;
+  }
+}
+</style>
+  <script type="module">
+const moneyFormatter = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 0,
+});
+
+const platformLabels = {
+  all: "All platforms",
+  railway: "Railway only",
+  claude: "Claude only",
+  openai: "OpenAI only",
+};
+
+const filterButtons = document.querySelectorAll("[data-filter]");
+const filterableItems = document.querySelectorAll("[data-platform][data-amount]");
+const totalAmount = document.querySelector("[data-total-amount]");
+const transactionCount = document.querySelector("[data-transaction-count]");
+const platformCount = document.querySelector("[data-platform-count]");
+const knownDateCount = document.querySelector("[data-known-date-count]");
+const filterStatus = document.querySelector("[data-filter-status]");
+const emptyStates = document.querySelectorAll("[data-empty-state]");
+
+const timelineItems = document.querySelectorAll(".timeline-card[data-platform]");
+const tableRows = document.querySelectorAll("tbody tr[data-platform]");
+
+const getVisibleItems = (items, filter) => {
+  return [...items].filter((item) => filter === "all" || item.dataset.platform === filter);
+};
+
+const updateVisibility = (filter) => {
+  filterableItems.forEach((item) => {
+    const shouldShow = filter === "all" || item.dataset.platform === filter;
+    item.classList.toggle("is-hidden", !shouldShow);
+  });
+
+  const visibleRows = getVisibleItems(tableRows, filter);
+  const visibleTimeline = getVisibleItems(timelineItems, filter);
+
+  const total = visibleRows.reduce((sum, row) => sum + Number(row.dataset.amount || 0), 0);
+  const platforms = new Set(visibleRows.map((row) => row.dataset.platform));
+
+  totalAmount.textContent = moneyFormatter.format(total);
+  transactionCount.textContent = visibleRows.length;
+  platformCount.textContent = platforms.size;
+  knownDateCount.textContent = visibleTimeline.length;
+  filterStatus.textContent = platformLabels[filter] || "Filtered view";
+
+  emptyStates.forEach((state) => {
+    const target = state.dataset.emptyState;
+
+    if (target === "timeline") {
+      state.style.display = visibleTimeline.length === 0 ? "block" : "none";
+    }
+
+    if (target === "table") {
+      state.style.display = visibleRows.length === 0 ? "block" : "none";
+    }
+  });
+};
+
+filterButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const filter = button.dataset.filter;
+
+    filterButtons.forEach((btn) => {
+      btn.classList.toggle("active", btn === button);
+      btn.setAttribute("aria-pressed", String(btn === button));
+    });
+
+    updateVisibility(filter);
+  });
+});
+
+updateVisibility("all");
+</script>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-main">
+        <p class="kicker">Purchase history timeline</p>
+        <h1>AI Tools & Hosting Spend</h1>
+        <p>
+          All purchase dates are displayed and sorted strictly in <b>DD/MM/YYYY</b> format.
+          Use the platform filters to view Railway, Claude, or OpenAI entries only.
+        </p>
+      </div>
+
+      <aside class="summary-card">
+        <div>
+          <div class="total-label">Filtered spend</div>
+          <div class="total-amount" data-total-amount>₹10,636</div>
+          <div class="filter-status" data-filter-status>All platforms</div>
+        </div>
+        <div class="metrics">
+          <div class="metric">
+            <span>Transactions</span>
+            <strong data-transaction-count>8</strong>
+          </div>
+          <div class="metric">
+            <span>Platforms</span>
+            <strong data-platform-count>3</strong>
+          </div>
+          <div class="metric">
+            <span>Dated entries</span>
+            <strong data-known-date-count>8</strong>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section filter-panel">
+      <div class="filter-title">
+        <h2>Filter by platform</h2>
+        <p>Click one platform to update the timeline, total spend, and detailed table.</p>
+      </div>
+      <div class="filter-actions" role="group" aria-label="Platform filter">
+        <button class="filter-btn active" type="button" data-filter="all" aria-pressed="true">All</button>
+        <button class="filter-btn" type="button" data-filter="railway" aria-pressed="false">Railway</button>
+        <button class="filter-btn" type="button" data-filter="claude" aria-pressed="false">Claude</button>
+        <button class="filter-btn" type="button" data-filter="openai" aria-pressed="false">OpenAI</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <div>
+          <h2>Timeline</h2>
+          <p>Sorted by actual date using DD/MM/YYYY parsing.</p>
+        </div>
+      </div>
+
+      <div class="timeline">
+        
+    <article class="timeline-card railway" data-platform="railway" data-amount="500">
+      <div class="timeline-date">
+        <span>12/04/2026</span>
+        <small>DD/MM/YYYY</small>
+      </div>
+      <div class="timeline-dot"></div>
+      <div class="card-content">
+        <div class="card-top">
+          <span class="badge railway">Railway</span>
+          <strong>₹500</strong>
+        </div>
+        <h3>Backend hosting</h3>
+        <p>Duration: <b>1 Month</b></p>
+      </div>
+    </article>
+    
+
+    <article class="timeline-card openai" data-platform="openai" data-amount="1999">
+      <div class="timeline-date">
+        <span>16/04/2026</span>
+        <small>DD/MM/YYYY</small>
+      </div>
+      <div class="timeline-dot"></div>
+      <div class="card-content">
+        <div class="card-top">
+          <span class="badge openai">OpenAI Codex</span>
+          <strong>₹1,999</strong>
+        </div>
+        <h3>Card subscription</h3>
+        <p>Duration: <b>1 Month</b></p>
+      </div>
+    </article>
+    
+
+    <article class="timeline-card railway" data-platform="railway" data-amount="572">
+      <div class="timeline-date">
+        <span>12/05/2026</span>
+        <small>DD/MM/YYYY</small>
+      </div>
+      <div class="timeline-dot"></div>
+      <div class="card-content">
+        <div class="card-top">
+          <span class="badge railway">Railway</span>
+          <strong>₹572</strong>
+        </div>
+        <h3>Backend hosting</h3>
+        <p>Duration: <b>1 Month</b></p>
+      </div>
+    </article>
+    
+
+    <article class="timeline-card openai" data-platform="openai" data-amount="1999">
+      <div class="timeline-date">
+        <span>13/05/2026</span>
+        <small>DD/MM/YYYY</small>
+      </div>
+      <div class="timeline-dot"></div>
+      <div class="card-content">
+        <div class="card-top">
+          <span class="badge openai">OpenAI Codex</span>
+          <strong>₹1,999</strong>
+        </div>
+        <h3>Card subscription</h3>
+        <p>Duration: <b>1 Month</b></p>
+      </div>
+    </article>
+    
+
+    <article class="timeline-card railway" data-platform="railway" data-amount="635">
+      <div class="timeline-date">
+        <span>13/06/2026</span>
+        <small>DD/MM/YYYY</small>
+      </div>
+      <div class="timeline-dot"></div>
+      <div class="card-content">
+        <div class="card-top">
+          <span class="badge railway">Railway</span>
+          <strong>₹635</strong>
+        </div>
+        <h3>Backend hosting</h3>
+        <p>Duration: <b>1 Month</b></p>
+      </div>
+    </article>
+    
+
+    <article class="timeline-card openai" data-platform="openai" data-amount="2247">
+      <div class="timeline-date">
+        <span>21/06/2026</span>
+        <small>DD/MM/YYYY</small>
+      </div>
+      <div class="timeline-dot"></div>
+      <div class="card-content">
+        <div class="card-top">
+          <span class="badge openai">OpenAI Codex</span>
+          <strong>₹2,247</strong>
+        </div>
+        <h3>Card subscription</h3>
+        <p>Duration: <b>1 Month</b></p>
+      </div>
+    </article>
+    
+
+    <article class="timeline-card claude" data-platform="claude" data-amount="2194">
+      <div class="timeline-date">
+        <span>05/12/2026</span>
+        <small>DD/MM/YYYY</small>
+      </div>
+      <div class="timeline-dot"></div>
+      <div class="card-content">
+        <div class="card-top">
+          <span class="badge claude">Claude</span>
+          <strong>₹2,194</strong>
+        </div>
+        <h3>Coding assistant</h3>
+        <p>Duration: <b>1 Month</b></p>
+      </div>
+    </article>
+    
+
+    <article class="timeline-card claude" data-platform="claude" data-amount="490">
+      <div class="timeline-date">
+        <span>05/12/2026</span>
+        <small>DD/MM/YYYY</small>
+      </div>
+      <div class="timeline-dot"></div>
+      <div class="card-content">
+        <div class="card-top">
+          <span class="badge claude">Claude</span>
+          <strong>₹490</strong>
+        </div>
+        <h3>Extra usage</h3>
+        <p>Duration: <b>1 Month</b></p>
+      </div>
+    </article>
+    
+      </div>
+      <div class="empty-state" data-empty-state="timeline">No purchase exists for this filter.</div>
+
+      <p class="note">
+        Date format used everywhere: <b>DD/MM/YYYY</b>.
+      </p>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <div>
+          <h2>Spend by Platform</h2>
+          <p>Grouped total spend across all entries.</p>
+        </div>
+      </div>
+      <div class="bars">
+        
+    <div class="bar-row" data-platform-summary="openai">
+      <div class="bar-label">
+        <span>OpenAI Codex</span>
+        <strong>₹6,245</strong>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: 100.0%"></div>
+      </div>
+    </div>
+    
+
+    <div class="bar-row" data-platform-summary="claude">
+      <div class="bar-label">
+        <span>Claude</span>
+        <strong>₹2,684</strong>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: 43.0%"></div>
+      </div>
+    </div>
+    
+
+    <div class="bar-row" data-platform-summary="railway">
+      <div class="bar-label">
+        <span>Railway</span>
+        <strong>₹1,707</strong>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: 27.3%"></div>
+      </div>
+    </div>
+    
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <div>
+          <h2>Detailed Records</h2>
+          <p>Raw data in clean table format. Dates remain exactly in DD/MM/YYYY format.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Sr.no</th>
+              <th>Platform and reason</th>
+              <th>Date of purchase</th>
+              <th>Duration</th>
+              <th>Payment</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+    <tr data-platform="claude" data-amount="2194">
+      <td>1</td>
+      <td>Claude - Coding assistant</td>
+      <td>05/12/2026</td>
+      <td>1 Month</td>
+      <td>₹2,194</td>
+    </tr>
+    
+
+    <tr data-platform="railway" data-amount="500">
+      <td>2</td>
+      <td>Railway - Backend hosting</td>
+      <td>12/04/2026</td>
+      <td>1 Month</td>
+      <td>₹500</td>
+    </tr>
+    
+
+    <tr data-platform="openai" data-amount="1999">
+      <td>3</td>
+      <td>OpenAI Codex - Card subscription</td>
+      <td>16/04/2026</td>
+      <td>1 Month</td>
+      <td>₹1,999</td>
+    </tr>
+    
+
+    <tr data-platform="claude" data-amount="490">
+      <td>4</td>
+      <td>Claude - Extra usage</td>
+      <td>05/12/2026</td>
+      <td>1 Month</td>
+      <td>₹490</td>
+    </tr>
+    
+
+    <tr data-platform="railway" data-amount="572">
+      <td>5</td>
+      <td>Railway - Backend hosting</td>
+      <td>12/05/2026</td>
+      <td>1 Month</td>
+      <td>₹572</td>
+    </tr>
+    
+
+    <tr data-platform="openai" data-amount="1999">
+      <td>6</td>
+      <td>OpenAI Codex - Card subscription</td>
+      <td>13/05/2026</td>
+      <td>1 Month</td>
+      <td>₹1,999</td>
+    </tr>
+    
+
+    <tr data-platform="railway" data-amount="635">
+      <td>7</td>
+      <td>Railway - Backend hosting</td>
+      <td>13/06/2026</td>
+      <td>1 Month</td>
+      <td>₹635</td>
+    </tr>
+    
+
+    <tr data-platform="openai" data-amount="2247">
+      <td>8</td>
+      <td>OpenAI Codex - Card subscription</td>
+      <td>21/06/2026</td>
+      <td>1 Month</td>
+      <td>₹2,247</td>
+    </tr>
+    
+          </tbody>
+        </table>
+      </div>
+      <div class="empty-state" data-empty-state="table">No table records exist for this filter.</div>
+    </section>
+
+    <p class="footer">Generated visual purchase timeline · Full total: ₹10,636 · Date format: DD/MM/YYYY</p>
+  </main>
+</body>
+</html>
